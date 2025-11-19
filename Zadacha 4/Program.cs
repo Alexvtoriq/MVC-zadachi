@@ -1,22 +1,64 @@
-﻿using Dumb_Password_Generator.Models;
-using Dumb_Password_Generator.Controller;
-
-namespace Dumb_Password_Generator
+﻿public class GeneratorModel
 {
-    public class Program
+    public int Number { get; set; } 
+    public string Text { get; set; }
+}
+public class GeneratorView
+{
+    public int GetNumberOfPasswords()
     {
-        public static void Main()
+        Console.WriteLine("Enter how many passwords to generate:");
+        int number;
+        while (!int.TryParse(Console.ReadLine(), out number) || number <= 0)
         {
-            int n = int.Parse(Console.ReadLine());
-            int l = int.Parse(Console.ReadLine());
-            Console.WriteLine();
-
-            var input = new PasswordGeneratorInput(n, l);
-            var service = new PasswordGeneratorService();
-            var output = service.Generate(input);
-
-            Console.WriteLine(string.Join(" ", output.Passwords));
+            Console.WriteLine("Please enter a valid positive number:");
         }
+        return number;
     }
 
+    public void ShowPasswords(List<GeneratorModel> passwords)
+    {
+        Console.WriteLine("Generated passwords:");
+        foreach (var password in passwords)
+        {
+            Console.WriteLine($"#{password.Number}: {password.Text}");
+        }
+    }
+}
+public class GeneratorController
+{
+    private readonly GeneratorView _view;
+
+    public GeneratorController()
+    {
+        _view = new GeneratorView();
+    }
+
+    public void Run()
+    {
+        int n = _view.GetNumberOfPasswords();
+
+        var passwords = GeneratePasswords(n);
+
+        _view.ShowPasswords(passwords);
+    }
+
+    private List<GeneratorModel> GeneratePasswords(int n)
+    {
+        var list = new List<GeneratorModel>();
+        for (int i = 1; i <= n; i++)
+        {
+            string password = $"P{i:D3}"; 
+            list.Add(new GeneratorModel { Number = i, Text = password });
+        }
+        return list;
+    }
+}
+class Program
+{
+    static void Main(string[] args)
+    {
+        var controller = new GeneratorController();
+        controller.Run();
+    }
 }
